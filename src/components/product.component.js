@@ -1,7 +1,7 @@
 import React, { Component } from "react";
-import TutorialDataService from "../services/tutorial.service";
+import ProductDataService from "../services/product.service";
 
-export default class Tutorial extends Component {
+export default class Product extends Component {
   constructor(props) {
     super(props);
     this.onChangeTitle = this.onChangeTitle.bind(this);
@@ -9,12 +9,14 @@ export default class Tutorial extends Component {
     this.updatePublished = this.updatePublished.bind(this);
     this.updateTutorial = this.updateTutorial.bind(this);
     this.deleteTutorial = this.deleteTutorial.bind(this);
+    this.onChangeSellingPrice = this.onChangeSellingPrice.bind(this);
 
     this.state = {
       currentTutorial: {
         key: null,
         title: "",
         description: "",
+        selling_price: 0,
         published: false,
       },
       message: "",
@@ -63,8 +65,19 @@ export default class Tutorial extends Component {
     }));
   }
 
+  onChangeSellingPrice(e) {
+    const sellingprice = e.target.value;
+
+    this.setState((prevState) => ({
+      currentTutorial: {
+        ...prevState.currentTutorial,
+        selling_price: sellingprice,
+      },
+    }));
+  }
+
   updatePublished(status) {
-    TutorialDataService.update(this.state.currentTutorial.key, {
+    ProductDataService.update(this.state.currentTutorial.key, {
       published: status,
     })
       .then(() => {
@@ -85,12 +98,13 @@ export default class Tutorial extends Component {
     const data = {
       title: this.state.currentTutorial.title,
       description: this.state.currentTutorial.description,
+      selling_price: this.state.selling_price
     };
 
-    TutorialDataService.update(this.state.currentTutorial.key, data)
+    ProductDataService.update(this.state.currentTutorial.key, data)
       .then(() => {
         this.setState({
-          message: "The category was updated successfully!",
+          message: "The product was updated successfully!",
         });
       })
       .catch((e) => {
@@ -99,7 +113,7 @@ export default class Tutorial extends Component {
   }
 
   deleteTutorial() {
-    TutorialDataService.delete(this.state.currentTutorial.key)
+    ProductDataService.delete(this.state.currentTutorial.key)
       .then(() => {
         this.props.refreshList();
       })
@@ -113,7 +127,7 @@ export default class Tutorial extends Component {
 
     return (
       <div>
-        <h4>Category</h4>
+        <h4>Product</h4>
         {currentTutorial ? (
           <div className="edit-form">
             <form>
@@ -135,6 +149,17 @@ export default class Tutorial extends Component {
                   id="description"
                   value={currentTutorial.description}
                   onChange={this.onChangeDescription}
+                />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="selling_price">Selling Price</label>
+                <input
+                  type="text"
+                  className="form-control"
+                  id="selling_price"
+                  value={currentTutorial.selling_price}
+                  onChange={this.onChangeSellingPrice}
                 />
               </div>
 
@@ -181,7 +206,7 @@ export default class Tutorial extends Component {
         ) : (
           <div>
             <br />
-            <p>Please click on a category...</p>
+            <p>Please click on a product...</p>
           </div>
         )}
       </div>

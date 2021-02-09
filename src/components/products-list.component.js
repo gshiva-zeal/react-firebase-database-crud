@@ -1,33 +1,36 @@
 import React, { Component } from "react";
-import TutorialDataService from "../services/tutorial.service";
+import ProductDataService from "../services/product.service";
 
-import Tutorial from "./tutorial.component";
+import Product from "./product.component";
 
-export default class TutorialsList extends Component {
+export default class ProductsList extends Component {
   constructor(props) {
     super(props);
     this.refreshList = this.refreshList.bind(this);
     this.setActiveTutorial = this.setActiveTutorial.bind(this);
     this.removeAllTutorials = this.removeAllTutorials.bind(this);
     this.onDataChange = this.onDataChange.bind(this);
+    this.onSearchTextChange = this.onSearchTextChange.bind(this);
 
     this.state = {
       tutorials: [],
+      searchProducts: [],
       currentTutorial: null,
       currentIndex: -1,
     };
   }
 
   componentDidMount() {
-    TutorialDataService.getAll().on("value", this.onDataChange);
+    ProductDataService.getAll().on("value", this.onDataChange);
   }
 
   componentWillUnmount() {
-    TutorialDataService.getAll().off("value", this.onDataChange);
+    ProductDataService.getAll().off("value", this.onDataChange);
   }
 
   onDataChange(items) {
     let tutorials = [];
+    let searchProducts = [];
 
     items.forEach((item) => {
       let key = item.key;
@@ -35,13 +38,16 @@ export default class TutorialsList extends Component {
       tutorials.push({
         key: key,
         title: data.title,
+        selling_price: data.selling_price,
         description: data.description,
         published: data.published,
       });
     });
+    searchProducts = tutorials;
 
     this.setState({
       tutorials: tutorials,
+      searchProducts: searchProducts
     });
   }
 
@@ -60,7 +66,7 @@ export default class TutorialsList extends Component {
   }
 
   removeAllTutorials() {
-    TutorialDataService.deleteAll()
+    ProductDataService.deleteAll()
       .then(() => {
         this.refreshList();
       })
@@ -69,17 +75,32 @@ export default class TutorialsList extends Component {
       });
   }
 
+  onSearchTextChange(e) {
+   let filteredProducts = []
+    if(e.target.value && e.target.value.length > 0) {
+      filteredProducts = this.state.searchProducts.filter(function(product) {
+       return product.title.indexOf(e.target.value) > 0;
+      })
+    }
+    else {
+      filteredProducts = this.state.tutorials
+    }
+    this.setState({
+      searchProducts: filteredProducts
+    })
+  }
+
   render() {
-    const { tutorials, currentTutorial, currentIndex } = this.state;
+    const { tutorials, currentTutorial, currentIndex, searchProducts } = this.state;
 
     return (
       <div className="list row">
         <div className="col-md-6">
-          <h4>Categories List</h4>
-
+          <h4>Product List</h4>
+          <input type="text" onChange={this.onSearchTextChange} placeholder="Search Product" />
           <ul className="list-group">
-            {tutorials &&
-              tutorials.map((tutorial, index) => (
+            {searchProducts &&
+              searchProducts.map((tutorial, index) => (
                 <li
                   className={
                     "list-group-item " +
@@ -102,14 +123,14 @@ export default class TutorialsList extends Component {
         </div>
         <div className="col-md-6">
           {currentTutorial ? (
-            <Tutorial
+            <Product
               tutorial={currentTutorial}
               refreshList={this.refreshList}
             />
           ) : (
             <div>
               <br />
-              <p>Please click on a category...</p>
+              <p>Please click on a product...</p>
             </div>
           )}
         </div>

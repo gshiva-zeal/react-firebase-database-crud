@@ -1,8 +1,8 @@
 import firebase from "../firebase";
 
-const db = firebase.ref("/categories");
+const db = firebase.ref("/products");
 
-class TutorialDataService {
+class ProductDataService {
   getAll() {
     return db;
   }
@@ -24,4 +24,4 @@ class TutorialDataService {
   }
 }
 
-export default new TutorialDataService();
+export default new ProductDataService();

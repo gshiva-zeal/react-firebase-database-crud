@@ -1,19 +1,20 @@
 import React, { Component } from "react";
-import TutorialDataService from "../services/tutorial.service";
+import ProductDataService from "../services/product.service";
 
-export default class AddTutorial extends Component {
+export default class AddProduct extends Component {
   constructor(props) {
     super(props);
     this.onChangeTitle = this.onChangeTitle.bind(this);
     this.onChangeDescription = this.onChangeDescription.bind(this);
     this.saveTutorial = this.saveTutorial.bind(this);
     this.newTutorial = this.newTutorial.bind(this);
+    this.onChangeSellingPrice = this.onChangeSellingPrice.bind(this);
 
     this.state = {
       title: "",
       description: "",
       published: false,
-
+      selling_price: 0,
       submitted: false,
     };
   }
@@ -30,16 +31,23 @@ export default class AddTutorial extends Component {
     });
   }
 
+  onChangeSellingPrice(e) {
+    this.setState({
+      selling_price: e.target.value,
+    })
+  }
+
   saveTutorial() {
     let data = {
       title: this.state.title,
       description: this.state.description,
+      selling_price: this.state.selling_price,
       published: false
     };
 
-    TutorialDataService.create(data)
+    ProductDataService.create(data)
       .then(() => {
-        console.log("Created new category successfully!");
+        console.log("Created new product successfully!");
         this.setState({
           submitted: true,
         });
@@ -71,17 +79,30 @@ export default class AddTutorial extends Component {
           </div>
         ) : (
           <div>
-            <h4>Add Category</h4>
+            <h4>Add Product</h4>
             <div className="form-group">
-              <label htmlFor="title">Title</label>
+              <label htmlFor="name">Name</label>
               <input
                 type="text"
                 className="form-control"
-                id="title"
+                id="name"
                 required
                 value={this.state.title}
                 onChange={this.onChangeTitle}
-                name="title"
+                name="name"
+              />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="sellingprice">Selling Price</label>
+              <input
+                type="text"
+                className="form-control"
+                id="sellingprice"
+                required
+                value={this.state.selling_price}
+                onChange={this.onChangeSellingPrice}
+                name="sellingprice"
               />
             </div>
 
